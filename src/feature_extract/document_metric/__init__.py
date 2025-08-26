@@ -11,7 +11,7 @@ class Industry_Support:
         #self.doc_quarty = {}
         self.doc_number = get_documentation_and_links_from_repo(self.repo_url,self.version) # 字典格式
         #self.doc_quarty = doc_quarty_all(self.repo_url,self.version)
-        self.path = get_readme_path(self.repo_url)
+        self.path = get_readme_path(self.repo_url, self.version)
 
     def get_doc_quarty(self):
         return self.doc_quarty
