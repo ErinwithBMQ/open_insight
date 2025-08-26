@@ -98,6 +98,7 @@ class GitHubMetadata:
     
     def get_release_notes(self):
         """获取指定索引中的仓库的发布说明。"""
+        repo_author = self.repo_url.split("/")[-2]
         platform = check_github_gitee(self.repo_url)
 
         get_metadata = {
@@ -117,7 +118,7 @@ class GitHubMetadata:
             "commit_message": ""
         }
         if metadata_new != not_data:
-            save_json(metadata_new, os.path.join(METADATA_PATH, f'{repo_name}_metadata.json'))
+            save_json(metadata_new, os.path.join(METADATA_PATH, f'{repo_author}_{repo_name}_metadata.json'))
 
         return metadata_new
 
@@ -149,7 +150,8 @@ class GitHubMetadata:
         import json
         import os
         repo_name = os.path.basename(self.repo_url)
-        json_path = os.path.join(METADATA_PATH, f"{repo_name}_metadata.json")
+        repo_author = self.repo_url.split("/")[-2]
+        json_path = os.path.join(METADATA_PATH, f"{repo_author}_{repo_name}_metadata.json")
         if not os.path.exists(json_path):
             print(f"文件不存在: {json_path}")
             return None, None

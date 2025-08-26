@@ -4,7 +4,7 @@ import os
 
 from .utils import TPL_PATH, save_json
 
-def fetch_dependencies(package_name, version,language):
+def fetch_dependencies(package_name, author, version,language):
     """
     Fetch dependencies from deps.dev API and save to a JSON file.
     
@@ -52,7 +52,7 @@ def fetch_dependencies(package_name, version,language):
             ans["description"] = dependency.get("description", "")
             res["dependencies"].append(ans)
 
-        save_json(res, os.path.join(TPL_PATH, f'{package_name}-{version}_dependencies.json'))
+        save_json(res, os.path.join(TPL_PATH, f'{author}_{package_name}-{version}_dependencies.json'))
         return res
 
     except Exception as e:
@@ -61,6 +61,7 @@ def fetch_dependencies(package_name, version,language):
 
 def solve(repo_url, version, language):
     package_name = repo_url.split("/")[-1]
+    repo_author = repo_url.split("/")[-2]
     if version is not None:
         version = version.replace("v", "")
     else:
@@ -72,7 +73,7 @@ def solve(repo_url, version, language):
         return {"error": "not get your language"}
 
     print(f"Fetching dependencies for {package_name} version {version}")
-    return fetch_dependencies(package_name, version, language)
+    return fetch_dependencies(package_name, repo_author, version, language)
     
 
 if __name__ == "__main__":
