@@ -118,8 +118,12 @@ def get_documentation_and_links_from_repo(repo_url,version=None):
     save_json(doc_number,os.path.join(DOC_NUM_PATH,f'{repo_name}_doc_num.json'))
     return doc_number
 
-def get_readme_path(repo_url):
-    repo_name = os.path.basename(repo_url)
+def get_readme_path(repo_url, version=None):
+    if version is None:
+        repo_name = os.path.basename(repo_url)
+    else:
+        repo_name = os.path.basename(repo_url) + "-" + version
+
     readme_path = os.path.join(TMP_PATH, repo_name)
     if os.path.exists(readme_path):
         return readme_path

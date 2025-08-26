@@ -49,7 +49,10 @@ class FeatureExtract:
 
     def get_all_filenames(self):
         list_all = get_all_unique_filenames(self.path)
-        save_json(list_all, os.path.join(FILENAME_PATH, f'{self.repo_url.split("/")[-1]}_filenames.json'))
+        if self.version is not None:
+            save_json(list_all, os.path.join(FILENAME_PATH, f'{self.repo_url.split("/")[-1]}-{self.version}_filenames.json'))
+        else:
+            save_json(list_all, os.path.join(FILENAME_PATH, f'{self.repo_url.split("/")[-1]}_filenames.json'))
         return list_all
 
     def get_repo_all_mes(self):
@@ -60,5 +63,8 @@ class FeatureExtract:
             "tpl": self.get_tpl(),
             "filenames": self.get_all_filenames()
         }
-        save_json(res, os.path.join(RES_PATH, f'{self.repo_url.split("/")[-1]}.json'))
+        if self.version is not None:
+            save_json(res, os.path.join(RES_PATH, f'{self.repo_url.split("/")[-1]}-{self.version}.json'))
+        else:
+            save_json(res, os.path.join(RES_PATH, f'{self.repo_url.split("/")[-1]}.json'))
         return res
