@@ -77,6 +77,7 @@ def search_readme_in_folder(path)->tuple:
     return flag,readme_contents
 
 def get_documentation_and_links_from_repo(repo_url,version=None):
+    repo_author = repo_url.split("/")[-2]
     if version is None:
         repo_name = os.path.basename(repo_url)  # os.path.basename 获取路径中的文件名部分
     else:
@@ -115,7 +116,7 @@ def get_documentation_and_links_from_repo(repo_url,version=None):
         "links_document_details": links
     }
 
-    save_json(doc_number,os.path.join(DOC_NUM_PATH,f'{repo_name}_doc_num.json'))
+    save_json(doc_number,os.path.join(DOC_NUM_PATH,f'{repo_author}_{repo_name}_doc_num.json'))
     return doc_number
 
 def get_readme_path(repo_url, version=None):

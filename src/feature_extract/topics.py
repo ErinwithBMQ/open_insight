@@ -69,8 +69,9 @@ def solve(repo_url):
     """
     topics = get_topics(repo_url)
     repo_name = os.path.basename(repo_url)
+    repo_author = repo_url.split("/")[-2]
     if topics:
-        save_json(topics, os.path.join(TOPICS_PATH, f'{repo_name}_topics.json'))
+        save_json(topics, os.path.join(TOPICS_PATH, f'{repo_author}_{repo_name}_topics.json'))
     return topics
 
 

@@ -16,6 +16,9 @@ class FeatureExtract:
         self.tpl = {}
         self.doc = {}
         self.path = None
+        self.repo_name = self.repo_url.split("/")[-1]
+        self.repo_author = self.repo_url.split("/")[-2]
+        self.repo = self.repo_author + '_' + self.repo_name
 
     def get_doc(self):
         dm = Industry_Support(self.repo_url, self.version)
@@ -50,9 +53,9 @@ class FeatureExtract:
     def get_all_filenames(self):
         list_all = get_all_unique_filenames(self.path)
         if self.version is not None:
-            save_json(list_all, os.path.join(FILENAME_PATH, f'{self.repo_url.split("/")[-1]}-{self.version}_filenames.json'))
+            save_json(list_all, os.path.join(FILENAME_PATH, f'{self.repo}_{self.version}_filenames.json'))
         else:
-            save_json(list_all, os.path.join(FILENAME_PATH, f'{self.repo_url.split("/")[-1]}_filenames.json'))
+            save_json(list_all, os.path.join(FILENAME_PATH, f'{self.repo}_filenames.json'))
         return list_all
 
     def get_repo_all_mes(self):
@@ -64,7 +67,7 @@ class FeatureExtract:
             "filenames": self.get_all_filenames()
         }
         if self.version is not None:
-            save_json(res, os.path.join(RES_PATH, f'{self.repo_url.split("/")[-1]}-{self.version}.json'))
+            save_json(res, os.path.join(RES_PATH, f'{self.repo}_{self.version}.json'))
         else:
-            save_json(res, os.path.join(RES_PATH, f'{self.repo_url.split("/")[-1]}.json'))
+            save_json(res, os.path.join(RES_PATH, f'{self.repo}.json'))
         return res
