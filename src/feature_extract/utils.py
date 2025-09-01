@@ -13,7 +13,7 @@ config = configparser.ConfigParser()
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 read_files = config.read(os.path.join(PROJECT_ROOT, 'config.ini'))
 DATA_PATH = config.get('GLOBAL_PATHS', 'tmp_path')
-SAVE_PATH = config.get('GLOBAL_PATHS', 'save_path')
+SAVE_PATH = config.get('GLOBAL_PATHS', 'tmp_path')
 
 TMP_PATH = os.path.join(DATA_PATH,'repos_tmp')
 JSON_REPOPATH = os.path.join(SAVE_PATH,'doc')

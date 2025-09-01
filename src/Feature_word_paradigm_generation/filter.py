@@ -35,6 +35,6 @@ def remove_dirs_without_nonempty_output(root_dir):
 
 
 if __name__ == "__main__":
-    target_dir = "/home/zyx/open_insight/Qwen-8b-ans1"
+    target_dir = "/Qwen-8b-ans1"
     # remove_empty_dirs(target_dir)Qwen-8b-ans1/Tencent_QTAF/output.txt
     remove_empty_dirs = remove_dirs_without_nonempty_output(target_dir)

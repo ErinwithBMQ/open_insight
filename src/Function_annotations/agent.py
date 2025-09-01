@@ -1,40 +1,84 @@
 import os
 import json
-from utils import read_json_file,chunk_text
+from .utils import read_json_file,chunk_text
 from openai import OpenAI
 import multiprocessing
 from multiprocessing import Pool, cpu_count
-from markdown_filter import MarkdownFilter
+from .markdown_filter import MarkdownFilter
 import shutil
 from tqdm import tqdm
 import configparser
 config = configparser.ConfigParser()
-config.read("config.ini") # 假设文件名为 config，但没有后缀
+config_path = os.path.dirname((os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+config.read(os.path.join(config_path, "config.ini")) # 假设文件名为 config，但没有后缀
 
+# 读取配置项，提供默认值以防止KeyError
 MODEL_NAME = config.get("DEFAULT", "model_name", fallback="")
-BASE_URL = config.get("DEFAULT", "base_url", fallback="")
-GITEE_AI_API_KEY = config.get("DEFAULT", "GITEE_AI_API_KEY", fallback="")
+BASE_URL = config.get("OPEN_CHECKService", "openai_api_url", fallback="")
+OPENAI_API_KEY = config.get("OPEN_CHECKService", "openai_api_key", fallback="")
+# GITHUB_TOKEN = config.get("ACCESS_TOKENS", "GITHUB_TOKEN", fallback="")
+DOMAIN = config.get("DEFAULT", "domain", fallback="AI技术领域")
+TMP_PATH = config.get("GLOBAL_PATHS", "tmp_path", fallback="tmp")
+NOLYREADME = config.getboolean("DEFAULT", "is_allDocuments", fallback=True)
+# 创建临时目录（如果不存在）
+function_annotations_path = os.path.join(TMP_PATH, "function_annotations")
+repo_tmp = os.path.join(TMP_PATH, "repos_tmp")
+if not os.path.exists(function_annotations_path):
+    os.makedirs(function_annotations_path)
 
-class Doc_agent:
-    def __init__(self, path=r"document_data"):
+class Doc_agent(OpenAI):
+    """ 文档处理代理类 """
+    def __init__(self, path, save_name,repo_name,version):
         self.path = path
         self.doc = read_json_file(self.path)
         self.model_name = MODEL_NAME
         self.base_url = BASE_URL
-        self.GITEE_AI_API_KEY = GITEE_AI_API_KEY
+        self.OPENAI_API_KEY = OPENAI_API_KEY
+        self.save_path = os.path.join(function_annotations_path, save_name)
+        self.repo_name = repo_name
+        self.version = version
 
     def filter_documents(self):
         """Filter documents based on a keyword."""
         # doc_number = self.doc.get("doc_number", 0)
         folder_document_details = self.doc.get("folder_document_details", "")
         filtered_docs = ""
-        for doc in folder_document_details:
-            filtered_content = doc.get("content", "")
+        if not NOLYREADME:
+            for doc in folder_document_details:
+                filtered_content = doc.get("content", "")
 
-            # filtered_content = filter_content_by_keyword(document_content)
-            filtered_content = "".join(filtered_content)
-            filtered_docs += f"{filtered_content}"
-        
+                # filtered_content = filter_content_by_keyword(document_content)
+                filtered_content = "".join(filtered_content)
+                filtered_docs += f"{filtered_content}"
+        else:
+            repo_name = os.path.basename(self.repo_name)
+            if self.version is not None:
+                repo_path = os.path.join(TMP_PATH, "repos_tmp",repo_name + "-" + self.version)
+            else:
+                repo_path = os.path.join(TMP_PATH, "repos_tmp",repo_name)
+
+            flag = 0
+            for root, dirs, files in os.walk(repo_path):
+                for doc in files:
+                    if "readme" in doc.lower():
+                        with open(os.path.join(root, doc), 'r', encoding='utf-8', errors='ignore') as f:
+                            filtered_docs += f.read()
+                        flag = 1
+                        break
+                if flag == 1:
+                    break
+            if flag == 0:
+                print("warnning::README file not found in the repository.use all documents instead.")
+                
+                for doc in folder_document_details:
+                    filtered_content = doc.get("content", "")
+
+                    # filtered_content = filter_content_by_keyword(document_content)
+                    filtered_content = "".join(filtered_content)
+                    filtered_docs += f"{filtered_content}"
+
+
+
         filtered_docs = filtered_docs.strip()
         if filtered_docs:
             filtered_docs = MarkdownFilter(filtered_docs).filter()['filtered_text']
@@ -47,7 +91,7 @@ class Doc_agent:
 
         prompt = f""" 
 
-                你是一个专业的技f术信息抽取专家，擅长从技术文档中提取结构化信息。你的任务是从提供的技术文档中准确提取以下关键信息：接下来你将会收到一系列的开源项目的文档，你的任务是针对目标文档进行功能总结。要求最终输出功能注解的形式,采用一条一条的描述.
+                你是一个专业的技术信息抽取专家，擅长从技术文档中提取结构化信息。你的任务是从提供的技术文档中准确提取以下关键信息：接下来你将会收到一系列的开源项目的文档，你的任务是针对目标文档进行功能总结。要求最终输出功能注解的形式,采用一条一条的描述.
                  请注意，你需要提取文档中的关键信息，并以简洁明了的方式呈现。
                  你的处理方式有以下流程组成请提供一个简洁的总结，包含文档的主要观点和关键信息。
 
@@ -108,26 +152,28 @@ class Doc_agent:
 
     def summarize_document(self):
         # 初始化
+        if not os.path.exists(self.save_path):
+            os.makedirs(self.save_path)
         doc = self.filter_documents()
         doc = chunk_text(doc, max_length=50000)
         prompt = self.create_summary_prompt()
         schema = self.create_summary_schema()
         content = ""    
-        save_name_tmp = f"{os.path.dirname(self.path)}//output_tmp.txt"
+        save_name_tmp = f"{self.save_path}//output_tmp.txt"
         save_name = save_name_tmp.replace("_tmp.txt", ".txt")
         if os.path.exists(save_name):
             print(f"{save_name} already exists, skipping...")
             return prompt, schema
 
         # 遍历文档内容并生成注解
-        for item in doc:
+        for item in doc[:5]:
             item = item.strip()
             if not item:
                 continue
             messages = [{"role": "system", "content": prompt}, {"role": "user", "content": item}]
             client = OpenAI(
                     base_url=self.base_url,
-                    api_key=self.GITEE_AI_API_KEY,
+                    api_key=self.OPENAI_API_KEY,
             )
 
             response = client.chat.completions.create(
@@ -262,7 +308,7 @@ class Doc_agent:
         messages = [{"role": "system", "content": prompt}, {"role": "user", "content": content}]
         client = OpenAI(
                 base_url=self.base_url,
-                api_key=self.GITEE_AI_API_KEY,
+                api_key=self.OPENAI_API_KEY,
         )
 
         response = client.chat.completions.create(
@@ -294,7 +340,7 @@ class Doc_agent:
 
         # llm = ChatOpenAI(
         #     model=self.model_name,
-        #     api_key=self.GITEE_AI_API_KEY,
+        #     api_key=self.OPENAI_API_KEY,
         #     base_url=self.base_url,
         #     streaming=True,
         #     temperature=0.5, 
@@ -322,7 +368,7 @@ def main():
     # Example usage
     # import time
     # start = time.time()
-    path = r"/home/zyx/open_insight/Scripts/doc_extract/doc_data"
+    path = r"/Scripts/doc_extract/doc_data"
     # doc_agent = Doc_agent(path)
     # doc_agent.summarize_document()
     # print("总共用时:", time.time() - start)
@@ -365,8 +411,8 @@ def run_summarize(path):
     
 
 def qianyi():
-    path = r"/home/zyx/open_insight/data2/document_data"
-    new_path = r"/home/zyx/open_insight/Scripts/doc_extract/qxy_new.csv"
+    path = r"data2/document_data"
+    new_path = r"Scripts/doc_extract/qxy_new.csv"
     data = {}
     import csv
     
@@ -382,13 +428,14 @@ def qianyi():
             if name == doc_name:
                 src= os.path.join(path, dir)
                 # json_path = os.path.join(full_path, "output.txt")
-                dst = os.path.join(r"/home/zyx/open_insight/Scripts/doc_extract/doc_data", data[name])
+                dst = os.path.join(r"Scripts/doc_extract/doc_data", data[name])
                 if not os.path.exists(dst):
                     os.mkdir(dst)
                 shutil.copy(src, dst)
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    run_summarize(r"data/doc/numpy_numpy-v2.3.2_doc_num.json")
 
 #    qianyi()

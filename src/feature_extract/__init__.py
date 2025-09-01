@@ -24,7 +24,7 @@ class FeatureExtract:
         dm = Industry_Support(self.repo_url, self.version)
         self.doc = dm.get_doc_all_mes()
         self.path = dm.get_path()
-        print(f"path is {self.path}")
+        print(f"{self.repo_url}-{self.version} clone path is {self.path}")
         return self.doc
 
     def get_topics(self):

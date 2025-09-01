@@ -15,7 +15,7 @@ GITEE_TOKEN = config.get('ACCESS_TOKENS', 'GITEE_TOKEN')
 GITHUB_TOKEN = config.get('ACCESS_TOKENS', 'GITHUB_TOKEN')
 
 DATA_PATH = config.get('GLOBAL_PATHS', 'tmp_path')
-SAVE_PATH = config.get('GLOBAL_PATHS', 'save_path')
+SAVE_PATH = config.get('GLOBAL_PATHS', 'tmp_path')
 
 TMP_PATH = os.path.join(DATA_PATH,'repos_tmp')
 JSON_REPOPATH = os.path.join(SAVE_PATH,'doc')
