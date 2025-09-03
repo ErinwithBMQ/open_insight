@@ -10,7 +10,7 @@ import json
 # 全局变量
 config = configparser.ConfigParser()
 config.read(os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.ini"))
-# /home/zyx/open_insight1/src/llm.py
+# src/llm.py
 # 领域细分
 DOMAIN = config.get('DEFAULT', 'domain', fallback=None)
 FINE_GRAINED_FIELDS = config.get('DEFAULT', 'fine_grained_fields', fallback=None)

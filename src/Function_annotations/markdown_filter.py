@@ -85,5 +85,5 @@ if __name__ == "__main__":
     md_filter = MarkdownFilter(doc)
     result = md_filter.filter()
 
-    with open(r"/home/zyx/open_insight/Scripts/doc_extract/filtered_document.txt", "w+", encoding="utf-8") as f:
+    with open(r"/Scripts/doc_extract/filtered_document.txt", "w+", encoding="utf-8") as f:
         f.write(result['filtered_text'])

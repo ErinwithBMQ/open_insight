@@ -1,0 +1,18 @@
+### 功能注解  1. **项目相关性描述**     - 主要功能：提供AI代理（Agent）的可观测性（Observability）、调试（Debugging）、评估（Benchmarking）及监控工具     - 技术定位：覆盖从原型开发到生产环境的全生命周期管理     - 解决问题领域：LLM成本控制、安全合规检测、多智能体系统协作异常排查     - 关联技术系统：深度集成CrewAI、AG2（AutoGen）、Camel AI、LangChain等框架  2. **技术栈**     - 核心框架/库：Python SDK | OpenAI Agents SDK | LangChain | LlamaIndex | LiteLLM | CamelAI | Mistral SDK     - 基础设施/平台：支持云原生部署及API监控仪表盘（Dashboard）     - 关键依赖项：需配置`AGENTOPS_API_KEY`环境变量以启用集成  3. **应用场景**     - 多智能体系统开发与协作监控（如SwarmZero AI）     - LLM调用成本追踪与优化（支持Cohere/Anthropic/Mistral等厂商）     - 安全合规检测（防御提示注入攻击与数据外泄）  4. **关键技术领域特征词汇**     Observability, DevTool, AI Agents, LLM Cost Management, Compliance and Security, Framework Integrations (CrewAI/AG2/Camel AI/LangChain), Agent Benchmarking (1000+ evals), Session Replays
+
+#### **1. 项目相关性描述**  
+    - **主要功能与定位**：提供覆盖全生命周期管理的AI代理（Agent）可观测性（Observability）、调试（Debugging）、评估（Benchmarking）及监控工具；集成深度支持多智能体系统协作异常排查与LLM成本控制方案  
+    - **解决的问题领域**：降低大语言模型（LLM）调用成本；实现安全合规检测机制；提升多智能体系统协作稳定性  
+    - **关联系统**：深度集成CrewAI、AG2（AutoGen）、Camel AI及LangChain等主流框架  
+
+#### **2. 技术栈**  
+    - **核心框架与库**：Python SDK | OpenAI Agents SDK | LangChain | LlamaIndex | LiteLLM | CamelAI | Mistral SDK  
+    - **基础设施/平台**：云原生部署架构 | API监控仪表盘(Dashboard)  
+    - **依赖项**：需配置`AGENTOPS_API_KEY`环境变量以启用第三方服务集成  
+
+#### **3. 应用场景**  
+    - **主要场景**：多智能体系统运行状态监测(如SwarmZero AI)｜大语言模型调用成本分析优化｜安全威胁防御(提示注入攻击/数据泄露)  
+    - **适用行业或领域**：人工智能研发｜企业级应用开发｜自动化决策系统构建  
+
+#### **4. 技术分类特征词**
+    - 关键词：Observability, DevTool, AI Agents, LLM Cost Management, Compliance and Security, Framework Integrations (CrewAI/AG2/Camel AI/LangChain), Agent Benchmarking (1000+ evals), Session Replays

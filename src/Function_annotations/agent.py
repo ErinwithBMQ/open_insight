@@ -20,6 +20,7 @@ OPENAI_API_KEY = config.get("OPEN_CHECKService", "openai_api_key", fallback="")
 DOMAIN = config.get("DEFAULT", "domain", fallback="AI技术领域")
 TMP_PATH = config.get("GLOBAL_PATHS", "tmp_path", fallback="tmp")
 NOLYREADME = config.getboolean("DEFAULT", "is_allDocuments", fallback=True)
+MAX_LENGTH = int(config.get("DEFAULT", "max_length", fallback=50000))
 # 创建临时目录（如果不存在）
 function_annotations_path = os.path.join(TMP_PATH, "function_annotations")
 repo_tmp = os.path.join(TMP_PATH, "repos_tmp")
@@ -155,7 +156,7 @@ class Doc_agent(OpenAI):
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
         doc = self.filter_documents()
-        doc = chunk_text(doc, max_length=50000)
+        doc = chunk_text(doc, max_length=MAX_LENGTH)
         prompt = self.create_summary_prompt()
         schema = self.create_summary_schema()
         content = ""    
@@ -205,6 +206,8 @@ class Doc_agent(OpenAI):
         content = content.strip()
         if not content:
             print("没有生成内容")
+            with open(save_name_tmp, "w+", encoding="utf-8") as f:
+                f.write("没有功能注解")
             return prompt, schema
         print(content)
 
@@ -361,7 +364,7 @@ class Doc_agent(OpenAI):
         with open(save_name, "w+", encoding="utf-8") as f:
             f.write(content)
 
-        return prompt, schema
+        return content
 
 
 def main():
@@ -415,7 +418,6 @@ def qianyi():
     new_path = r"Scripts/doc_extract/qxy_new.csv"
     data = {}
     import csv
-    
     with open(new_path, "r", encoding="utf-8") as f:
        reader = csv.reader(f)
        for row in reader:

@@ -10,7 +10,7 @@ import sys
 from multiprocessing import Pool
 import multiprocessing
 
-SAVE_PATH = r"/home/zyx/open_insight/Qwen-8b-ans1"
+SAVE_PATH = r"Qwen-8b-ans1"
 if not os.path.exists(SAVE_PATH):
     os.makedirs(SAVE_PATH)
 
@@ -36,8 +36,8 @@ def load_data():
     """
 
 
-    filter_data = pd.read_csv(r"/home/zyx/open_insight/data/file_data_after_filter.csv")
-    github_meadata = pd.read_csv(r"/home/zyx/open_insight/data/github_metadata.csv")
+    filter_data = pd.read_csv(r"/data/file_data_after_filter.csv")
+    github_meadata = pd.read_csv(r"/data/github_metadata.csv")
     filter_dict = dict(zip(filter_data.iloc[:, 0], filter_data.iloc[:, 1]))
     def df_to_dict(df):
         result = {}
@@ -51,14 +51,14 @@ def load_data():
 
     github_meadata_dict = df_to_dict(github_meadata)
     # list(github_meadata_dict.items())[:10]
-    topics = pd.read_csv(r"/home/zyx/open_insight/data/topics.csv")
+    topics = pd.read_csv(r"/data/topics.csv")
     topics_dict = dict(zip(topics.iloc[:, 0], topics.iloc[:, 1]))
     # # 测试
     # repo_name = 'https://github.com/Arthur151/ROMP'
     # item = f"请你判断提取一下这个输入，repo_name:{repo_name}"+f"{github_meadata_dict.get(repo_name, '')}"+f",topics:{topics_dict.get(repo_name, '')}"+f",files:{filter_dict.get(os.path.basename(repo_name), '')}"
     # item_chunks = chunk_text(item)
     # # item_list.append(item_chunks)
-    # save_name = f"/home/zyx/open_insight/Qwen-8b-ans1/{repo_name.replace('https://github.com/', '').replace('/', '_')}"
+    # save_name = f"/Qwen-8b-ans1/{repo_name.replace('https://github.com/', '').replace('/', '_')}"
     # process_LLM_feature_extract(item_chunks,save_path=save_name)
 
     
@@ -74,7 +74,7 @@ def load_data():
         item = f"请你判断提取一下这个输入，repo_name:{repo_name}"+f"{github_meadata_dict.get(repo_name, '')}"+f",topics:{topics_dict.get(repo_name, '')}"+f",files:{filter_dict.get(os.path.basename(repo_name), '')}"
         item_chunks = chunk_text(item)
         item_list.append(item_chunks)
-        save_name = f"/home/zyx/open_insight/Qwen-8b-ans1/{repo_name.replace('https://github.com/', '').replace('/', '_')}"
+        save_name = f"/Qwen-8b-ans1/{repo_name.replace('https://github.com/', '').replace('/', '_')}"
 
         save_name_list.append(save_name)
 
@@ -90,7 +90,7 @@ def load_data():
         # 使用 starmap 传递多个参数[1,6](@ref)
         try:
             results = pool.starmap(process_LLM_feature_extract, params)
-            with open(os.path.join(SAVE_PATH, "/home/zyx/open_insight/result.txt"), "w", encoding="utf-8") as f:
+            with open(os.path.join(SAVE_PATH, "/result.txt"), "w", encoding="utf-8") as f:
                 for result in results:
                     f.write("\n".join(result) + "\n")
         except Exception as e:

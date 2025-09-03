@@ -50,7 +50,10 @@ def function_annotations(repo_name, version):
     repo_url = repo_name
     
     repo_name = f"{repo_name.replace('https://github.com/', '').replace('http://gitee.com/', '').replace('.git', '').replace('/', '_')}"
-    doc_path = os.path.join(function_annotations_path, repo_name+"-"+version+"_doc_num.json")
+    if version is not None:
+        doc_path = os.path.join(function_annotations_path, repo_name+"-"+version+"_doc_num.json")
+    else:
+        doc_path = os.path.join(function_annotations_path, repo_name+"_doc_num.json")
     if not os.path.exists(doc_path):
         logging.error(f"Document path {doc_path} does not exist. Please ensure the document data is available.")
         return None
@@ -111,7 +114,7 @@ def generate_open_insight_prompt(repo_url,version=None):
     res = llm.run(save_path=save_path, save_name_tmp=save_name_tmp)
     return res
 
-def main():
+def main(repo_name, version=None):
     # parser = argparse.ArgumentParser(description="Run LLMOpenInsight with repository name and version.")
     # parser.add_argument("repo_name", type=str, help="Name of the repository.")
     # parser.add_argument("version", type=str, nargs='?', default=None, help="Version of the repository. (optional, default is empty string)")
@@ -123,7 +126,8 @@ def main():
         def __init__(self, repo_name, version):
             self.repo_name = repo_name
             self.version = version
-    args = Args("https://github.com/AgentOps-AI/agentops", "1.2")
+    # args = Args("https://github.com/AgentOps-AI/agentops", "0.4.13")
+    args = Args(repo_name, version)
 
     logging.info(f"Running domain for repository: {args.repo_name} with version: {args.version}")
 
@@ -133,16 +137,19 @@ def main():
 
     logging.info("Feature extraction completed.")
     logging.info("***********************************************************")
-    
 
-    logging.info("Starting feature word generation...")
-    word = word_generate(args.repo_name, args.version)
-    if word is None:
-        logging.error("ERROR: Feature word generation failed due to missing document data.Maybe generate wrong ans.")
-        # return
-    logging.info(f"Feature word generation result: \n{word}")
-    logging.info("Feature word generation completed.")
-    logging.info("***********************************************************")
+    if args.repo_name.replace('https://github.com/', '').replace('http://gitee.com/', '').replace('.git', '').replace('/', '_') in os.listdir("data/word_paradigm_generation"):
+        logging.info(f"Repository {args.repo_name} has already been processed.")
+    else:
+
+        logging.info("Starting feature word generation...")
+        word = word_generate(args.repo_name, args.version)
+        if word is None:
+            logging.error("ERROR: Feature word generation failed due to missing document data.Maybe generate wrong ans.")
+            # return
+        logging.info(f"Feature word generation result: \n{word}")
+        logging.info("Feature word generation completed.")
+        logging.info("******************************")
 
 
     logging.info("Starting function annotations...")
@@ -161,9 +168,25 @@ def main():
     logging.info("***********************************************************")
 
     # 开始清理tmp
-    logging.info("Starting cleanup...")
-    clean()
-    logging.info("Cleanup completed.")
+    if len(os.listdir(os.path.join(TMP_PATH,"doc")))>100:
+        logging.info("Starting cleanup...")
+        clean()
+        logging.info("Cleanup completed.")
+        logging.info("All tasks completed successfully.")
+    
+    #重新新建中间文件
+    logging.info("Recreate intermediate directories...")
+    if not os.path.exists(os.path.join(TMP_PATH,"doc")):
+        os.makedirs(os.path.join(TMP_PATH,"doc"))
+    if not os.path.exists(os.path.join(TMP_PATH,"filenames")):
+        os.makedirs(os.path.join(TMP_PATH,"filenames"))
+    if not os.path.exists(os.path.join(TMP_PATH,"topics")):
+        os.makedirs(os.path.join(TMP_PATH,"topics"))
+    if not os.path.exists(os.path.join(TMP_PATH,"tpl")):
+        os.makedirs(os.path.join(TMP_PATH,"tpl"))
+    if not os.path.exists(os.path.join(TMP_PATH,"metadata")):
+        os.makedirs(os.path.join(TMP_PATH,"metadata"))
+    logging.info("Intermediate directories recreated.")
     logging.info("All tasks completed successfully.")
 
 if __name__ == "__main__":

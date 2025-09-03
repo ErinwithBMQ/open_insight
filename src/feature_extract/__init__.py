@@ -59,6 +59,7 @@ class FeatureExtract:
         return list_all
 
     def get_repo_all_mes(self):
+        version = self.version
         res =  {
             "doc": self.get_doc(),
             "topics": self.get_topics(),
@@ -66,8 +67,8 @@ class FeatureExtract:
             "tpl": self.get_tpl(),
             "filenames": self.get_all_filenames()
         }
-        if self.version is not None:
-            save_json(res, os.path.join(RES_PATH, f'{self.repo}_{self.version}.json'))
+        if version is not None:
+            save_json(res, os.path.join(RES_PATH, f'{self.repo}_{version}.json'))
         else:
             save_json(res, os.path.join(RES_PATH, f'{self.repo}.json'))
         return res

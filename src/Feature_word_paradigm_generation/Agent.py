@@ -66,7 +66,7 @@ class FeatureWordParadigm(OpenAI):
 
         for key,value in meadata.items():
             if key =="release_notes":
-                meadata1 += f"release_data:{value['body'].replace('\n', '').replace('\r', '').replace('\"', '')},"
+                meadata1 += f"release_data:{value.get('body', '').replace('\n', '').replace('\r', '').replace('\"', '')},"
             else:
                 meadata1 += f"{key}:{value},"
         meadata = meadata1
