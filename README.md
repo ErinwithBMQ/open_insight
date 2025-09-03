@@ -64,25 +64,25 @@ You will see the following page:
 
 ![main.png](readme_img/main.png)
 
-#### start 全部开始
+#### start
 
 Enter the open source project link you want to process in the text box above. Click `start` to begin processing. After completion, detailed results will be displayed in the various sections below:
 
 ![1.gif](readme_img/1.gif)
 
-#### 宏领域划分
+#### Macro Field Division
 
 Click the `宏领域划分` button at the bottom right to start macro field division. After completion, the results will be displayed:
 
 ![2.gif](readme_img/2.gif)
 
-#### 生成功能注解
+#### Generate Functional Annotations
 
 Click the `生成功能注解` button at the bottom right to start functional annotation. Click on the text functional annotation section to show progress. After completion, the results will be displayed:
 
 ![3.gif](readme_img/3.gif)
 
-#### 技术领域分类
+#### Technical Field Classification
 
 Click the `技术领域分类` button at the bottom right to start technical field classification. After completion, the results will be displayed:
 
